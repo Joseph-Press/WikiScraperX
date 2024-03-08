@@ -10,15 +10,3 @@ This repository contains the WikiScraper project, a Python script designed to sc
 
 - Python 3.x
 - Additional Python packages, as listed in `requirements.txt`.
-
-## Usage
-
-The script can be used in two main ways:
-
-### Parse All Tables from an HTML File to a Directory
-
-Run the command below to parse all tables in an HTML file and save them as separate CSV files in a directory.
-
-
-## Todos: 
-Allow to parse tables from a URL
