@@ -11,23 +11,6 @@ This repository contains the WikiScraper project, a Python script designed to sc
 - Python 3.x
 - Additional Python packages, as listed in `requirements.txt`.
 
-## Installation
-
-1. Clone the GitHub repository.
-    ```
-    git clone https://github.com/Joseph-Press/WikiScraper.git
-    ```
-
-2. Navigate to the directory where the repository was cloned.
-    ```
-    cd WikiScraper
-    ```
-
-3. Install the required Python packages.
-    ```
-    pip install -r requirements.txt
-    ```
-
 ## Usage
 
 The script can be used in two main ways:
