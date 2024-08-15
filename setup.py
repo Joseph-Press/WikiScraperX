@@ -15,6 +15,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Joseph-Press/WikiScraper",
+    download_url="https://github.com/Joseph-Press/WikiScraper/archive/refs/tags/1.0.1.tar.gz",
     packages=setuptools.find_packages(),
     scripts=["scripts/wikiscraper"],
     install_requires=requirements,
