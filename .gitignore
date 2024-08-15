@@ -81,4 +81,4 @@ celerybeat-schedule
 # virtualenv
 venv/
 ENV/
-newvenv/
+newenv/
