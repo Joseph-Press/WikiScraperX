@@ -7,17 +7,17 @@ with open("requirements.txt") as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(
-    name="wikiscraper",
+    name="wikiscraperx",
     version="1.0.1",
     author="Joseph Press",
     author_email="joepress101@gmail.com",
     description="scrape Wikipedia tables into CSV’s, enhancing data compatibility for text processing.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Joseph-Press/WikiScraper",
-    download_url="https://github.com/Joseph-Press/WikiScraper/archive/refs/tags/1.0.1.tar.gz",
+    url="https://github.com/Joseph-Press/wikiscraperx",
+    download_url="https://github.com/Joseph-Press/wikiscraperx/archive/refs/tags/1.0.1.tar.gz",
     packages=setuptools.find_packages(),
-    scripts=["scripts/wikiscraper"],
+    scripts=["scripts/wikiscraperx"],
     install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',
