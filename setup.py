@@ -1,10 +1,11 @@
 import setuptools
+import os
 
-with open("readme.md", "r") as f:
-    long_description = f.read()
-
-with open("requirements.txt") as f:
-    requirements = f.read().splitlines()
+if os.path.exists("readme.md"):
+    with open("readme.md", "r") as f:
+        long_description = f.read()
+else:
+    long_description = "scrape Wikipedia tables into CSV’s, enhancing data compatibility for text processing."
 
 setuptools.setup(
     name="wikiscraperx",
