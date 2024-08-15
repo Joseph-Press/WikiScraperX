@@ -8,7 +8,7 @@ fi
 . venv/bin/activate
 pip install -r requirements.txt -r requirements_dev.txt
 
-coverage run --source wikitablescrape -m unittest discover
+coverage run --source wikiscraper -m unittest discover
 coverage report --fail-under=80
 
 rm -rf build/ dist/
