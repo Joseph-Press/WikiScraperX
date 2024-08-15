@@ -19,7 +19,13 @@ setuptools.setup(
     download_url="https://github.com/Joseph-Press/WikiScraperX/archive/refs/tags/1.0.2.tar.gz",
     packages=setuptools.find_packages(),
     scripts=["scripts/wikiscraperx"],
-    install_requires=requirements,
+    install_requires=[
+          'setuptools',
+          'beautifulsoup4',
+          "lxml",
+          "requests",
+          "table_parser"
+      ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         "Programming Language :: Python :: 3",
