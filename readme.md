@@ -10,3 +10,6 @@ This repository contains the wikiscraperx project, a Python script designed to s
 
 - Python 3.x
 - Additional Python packages, as listed in `requirements.txt`.
+
+## Installation
+Currently still being rapidly worked on, but `pip install -i https://test.pypi.org/simple/ wikiscraperx==1.0.4.1` is the current build. 
