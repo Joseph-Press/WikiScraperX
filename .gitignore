@@ -82,4 +82,4 @@ celerybeat-schedule
 venv/
 ENV/
 newenv/
-newenv\Scripts
+newenv/Scripts
