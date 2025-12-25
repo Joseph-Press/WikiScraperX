@@ -5,6 +5,7 @@ import re
 import sys
 
 import bs4
+from bs4 import BeautifulSoup as bs
 
 LOG = logging.getLogger(__name__)
 
@@ -27,99 +28,129 @@ class HtmlToTable:
     def __init__(self, table_tag):
         self.table_tag = table_tag
 
-    # Extract table header if available
     def extract_header(self):
         caption = self.table_tag.find("caption")
         if caption:
             return sanitize_cell(caption)
         return None
 
-    # Extract rows from the table
     def extract_rows(self):
         saved_row_data = []
-        for row in self.table_tag.findAll("tr"):
-            cells = row.findAll(["th", "td"])
+        for row in self.table_tag.find_all("tr"):
+            cells = row.find_all(["th", "td"])
 
-            # Handle colspan attributes
+            # handle colspan attributes
             for idx, cell in reversed(list(enumerate(cells))):
                 if cell.has_attr("colspan"):
                     for _ in range(int(cell["colspan"]) - 1):
                         cells.insert(idx, cell)
 
-            # Initialize saved_row_data for the first row
+            # initialize saved_row_data for the first row
             if not saved_row_data:
                 saved_row_data = [None for _ in cells]
 
-            # Handle rowspan attributes
+            # handle rowspan
             elif len(cells) != len(saved_row_data):
                 for idx, row_data in enumerate(saved_row_data):
                     if row_data and row_data.remaining_rows:
                         cells.insert(idx, row_data.get_value())
 
-            # Save rowspan data for future rows
+            # save rowspan for future rows
             for idx, cell in enumerate(cells):
                 if cell.has_attr("rowspan"):
                     saved_row_data[idx] = RowCounter(cell)
 
-            # Sanitize cell data
             cleaned = [sanitize_cell(cell) for cell in cells]
 
-            # Fill in missing columns with empty strings
+            # fill in missing col with empty strings
             missing_cols = len(saved_row_data) - len(cleaned)
             if missing_cols:
                 cleaned += [""] * missing_cols
 
             yield cleaned
 
-    # Save table to a CSV file
+    # save table to a CSV file
     def save_to_file(self, path):
         with open(path, mode="w", newline="", encoding="utf-8") as f:
             self.save(f)
 
-    # Write table to a CSV output (can be a file or stdout)
+    # write table to a CSV
     def save(self, output=sys.stdout):
         csv_writer = csv.writer(output, quoting=csv.QUOTE_ALL, lineterminator="\n")
         for row in self.extract_rows():
             csv_writer.writerow(row)
 
-# Class to parse multiple HTML tables
+    # save table to a JSON file
+    def save_to_json(self, path):
+        import json
+        rows = list(self.extract_rows())
+        data = []
+        if not rows:
+            return
+
+        # assuming first row is header
+        headers = rows[0]
+        for row in rows[1:]:
+             # zip headers with row data
+             entry = {}
+             for i, cell in enumerate(row):
+                 if i < len(headers):
+                     entry[headers[i]] = cell
+                 else:
+                     entry[f"col_{i}"] = cell
+             data.append(entry)
+        
+        with open(path, mode="w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
 class TableParser:
     def __init__(self, html_text):
         self.html_tables = [HtmlToTable(tag) for tag in extract_tables_from_html(html_text, min_columns=2)]
 
-    # Save all tables to a directory as separate CSV files
-    def save_to_folder(self, folder_path):
+    # save all tables to a directory as separate CSV files
+    def save_to_folder(self, folder_path, format="csv"):
         os.makedirs(folder_path, exist_ok=True)
         for idx, table in enumerate(self.html_tables):
             file_name = f"table_{idx + 1}"
             header = table.extract_header()
             if header:
                 file_name += "_" + header
-            file_path = os.path.join(folder_path, generate_csv_filename(file_name))
-            LOG.info(f"Saving table {idx + 1} to {file_path}")
-            table.save_to_file(file_path)
+            
+            if format == "json":
+                file_path = os.path.join(folder_path, generate_csv_filename(file_name).replace(".csv", ".json"))
+                LOG.info(f"Saving table {idx + 1} to {file_path}")
+                table.save_to_json(file_path)
+            else:
+                file_path = os.path.join(folder_path, generate_csv_filename(file_name))
+                LOG.info(f"Saving table {idx + 1} to {file_path}")
+                table.save_to_file(file_path)
 
-    # Save a single table to a CSV file based on its index
-    def save_single_table(self, index, folder_path):
+    # save a single table to CSV file based on its index
+    def save_single_table(self, index, folder_path, format="csv"):
         if index < len(self.html_tables):
             table = self.html_tables[index]
             file_name = f"table_{index + 1}"
             header = table.extract_header()
             if header:
                 file_name += "_" + header
-            file_path = os.path.join(folder_path, generate_csv_filename(file_name))
-            LOG.info(f"Saving table {index + 1} to {file_path}")
-            table.save_to_file(file_path)
+            
+            if format == "json":
+                file_path = os.path.join(folder_path, generate_csv_filename(file_name).replace(".csv", ".json"))
+                LOG.info(f"Saving table {index + 1} to {file_path}")
+                table.save_to_json(file_path)
+            else:
+                file_path = os.path.join(folder_path, generate_csv_filename(file_name))
+                LOG.info(f"Saving table {index + 1} to {file_path}")
+                table.save_to_file(file_path)
         else:
             LOG.error(f"Table index {index} out of range")
 
-# Extract tables from HTML text with at least min_columns
 def extract_tables_from_html(html_text, min_columns=2):
     soup = bs(html_text, "lxml")
-    tables = soup.findAll("table")
-    return [table for table in tables if len(table.findAll("tr")) > 1 and len(table.findAll("tr")[0].findAll(["th", "td"])) >= min_columns]
+    tables = soup.find_all("table")
+    return [table for table in tables if len(table.find_all("tr")) > 1 and len(table.find_all("tr")[0].find_all(["th", "td"])) >= min_columns]
 
-# Sanitize cell data by removing unnecessary tags
+# sanitize cell data by removing extra tags
 def sanitize_cell(cell):
     to_remove = (
         {"name": "sup", "class": "reference"},
@@ -128,33 +159,33 @@ def sanitize_cell(cell):
     )
 
     for tag in to_remove:
-        for match in cell.findAll(**tag):
+        for match in cell.find_all(**tag):
             match.extract()
 
-    # Replace <br> tags with spaces
-    line_breaks = cell.findAll("br")
+    # replace <br> tags with spaces
+    line_breaks = cell.find_all("br")
     for br in line_breaks:
         br.replace_with(new_span(" "))
 
-    # Handle cells that contain only an image
-    tags = cell.findAll()
+    # handle cells that contain only an image
+    tags = cell.find_all()
     if len(tags) == 1 and tags[0].name == "img":
         return clean_spaces(tags[0]["alt"])
 
-    # Remove footnotes and other bracketed text
-    tags = [t for t in cell.findAll(text=True) if not t.startswith("[")]
+    # remove footnotes and other bracketed text
+    tags = [t for t in cell.find_all(string=True) if not t.startswith("[")]
 
     return clean_spaces("".join(tags))
 
-# Remove extra whitespace from text
+# remove extra whitespace from text
 def clean_spaces(text):
     return re.sub(r"\s+", " ", text).strip()
 
-# Create a new <span> tag
+# create a new <span> tag
 def new_span(text_value):
     return bs(f"<span>{text_value}</span>", "lxml").html.body.span
 
-# Generate a CSV file name from text
+# generate a CSV file name from text
 def generate_csv_filename(text):
     text = text.lower()
     text = re.sub(r"[,|'|\"/]", "", text)
