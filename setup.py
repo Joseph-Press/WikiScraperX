@@ -9,7 +9,7 @@ else:
 
 setuptools.setup(
     name="wikiscraperx",
-    version="1.0.4.1",
+    version="1.0.6",
     author="Joseph Press",
     author_email="joepress101@gmail.com",
     description="scrape Wikipedia tables into CSV’s, enhancing data compatibility for text processing.",

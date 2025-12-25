@@ -45,4 +45,18 @@ wikiscraperx --url "https://en.wikipedia.org/wiki/Python_(programming_language)"
 Save as JSON to stdout:
 ```bash
 wikiscraperx --url "https://en.wikipedia.org/wiki/Python_(programming_language)" --header "Summary of Python 3's built-in types" --format json
-``` 
+```
+
+## Use Cases
+
+### Sports Stats Analysis
+Scrape professional records of athletes (e.g., MMA fighters) for analysis:
+```bash
+wikiscraperx --url "https://en.wikipedia.org/wiki/Khabib_Nurmagomedov" --output-folder ./fighters/khabib --format json
+```
+
+### Climate Data Collection
+Extract historical weather and climate data tables for specific regions:
+```bash
+wikiscraperx --url "https://en.wikipedia.org/wiki/Climate_of_London" --output-folder ./weather/london --format csv
+```
